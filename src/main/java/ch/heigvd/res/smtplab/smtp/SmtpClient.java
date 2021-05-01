@@ -31,11 +31,14 @@ public class SmtpClient implements ISmtpClient {
         Socket socket = new Socket(smptServerAddress, smtpServerPort);
 
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-        writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
+        writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
 
         System.out.println(reader.readLine());
 
-        writer.println("EHLO " + smptServerAddress);
+        writer.print("EHLO ");
+        writer.print(smptServerAddress);
+        writer.print("\r\n");
+        writer.flush();
 
         String line = reader.readLine();
         System.out.println(line);
@@ -48,8 +51,13 @@ public class SmtpClient implements ISmtpClient {
         if(!line.startsWith("250 "))
             throw new IOException("Error");
 
-        StringBuilder header = new StringBuilder("From: " + mail.getFrom() + "\n");
-        writer.println("MAIL FROM: " + mail.getFrom());
+        // Start to send
+        StringBuilder header = new StringBuilder("From: " + mail.getFrom() + "\r\n");
+
+        writer.print("MAIL FROM: ");
+        writer.print(mail.getFrom());
+        writer.print("\r\n");
+        writer.flush();
 
         reader.readLine();
 
@@ -60,38 +68,59 @@ public class SmtpClient implements ISmtpClient {
             header.append(to);
             prefix = ", ";
 
-            String msg = "RCPT TO: " + to;
-            writer.println(msg);
+            writer.print("RCPT TO: ");
+            writer.print(to);
+            writer.print("\r\n");
+            writer.flush();
+
             reader.readLine();
         }
 
-        header.append("\n");
-        header.append("Cc: ");
+        header.append("\r\n");
+        header.append("Cci: ");
         prefix = "";
-        for(String toCC : mail.getToCC()) {
+        for(String toBCC : mail.getToBCC()) {
             header.append(prefix);
-            header.append(toCC);
+            header.append(toBCC);
             prefix = ", ";
 
-            String msg = "RCPT TO: " + toCC;
-            writer.println(msg);
+
+            writer.print("RCPT TO: ");
+            writer.print(toBCC);
+            writer.print("\r\n");
+            writer.flush();
+
             reader.readLine();
         }
 
-        header.append("\n");
+        header.append("\r\n");
 
-        writer.println("DATA");
+        writer.print("DATA");
+        writer.print("\r\n");
+        writer.flush();
 
         reader.readLine();
+        writer.write("Content-type: text/plain; charset=\"utf-8\"\r\n");
 
         header.append(mail.getBody());
 
-        writer.println(header.toString());
-        writer.println(".");
+
+
+        writer.print(header.toString());
+
+        // End data "section"
+        writer.print("\r\n");
+        writer.print(".");
+        writer.print("\r\n");
+
+        writer.flush();
 
         reader.readLine();
 
-        writer.println("QUIT");
+        // Quit
+        writer.print("QUIT");
+        writer.print("\r\n");
+        writer.flush();
 
         socket.close();
 
