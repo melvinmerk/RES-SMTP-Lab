@@ -12,8 +12,6 @@ public class Mail {
     private String body;
     private String subject;
 
-    public Mail() {}
-
     public Mail(String from, String body, String[] to, String[] toBCC) {
         this.from = from;
         this.body = encodeBodySubject(body);

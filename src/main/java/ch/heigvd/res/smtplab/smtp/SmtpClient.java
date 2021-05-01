@@ -104,8 +104,6 @@ public class SmtpClient implements ISmtpClient {
 
         header.append(mail.getBody());
 
-
-
         writer.print(header.toString());
 
         // End data "section"
