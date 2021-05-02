@@ -6,6 +6,7 @@ This repository is a basic implementation of an SMTP (email) pranking program.
 
 
 ## Usage
+Download latest release zip. Unzip to desired location.  
 To use the program simply edit the 3 configuration files (in config folder): 
 - config.properties
     - smtpServerAddress: _Address of the target SMTP server_
