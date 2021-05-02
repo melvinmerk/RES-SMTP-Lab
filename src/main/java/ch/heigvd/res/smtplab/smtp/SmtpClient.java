@@ -27,25 +27,23 @@ public class SmtpClient implements ISmtpClient {
     @Override
     public void sendMail(Mail mail) throws IOException {
 
-        // Test
         Socket socket = new Socket(smptServerAddress, smtpServerPort);
 
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
         writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
 
-        System.out.println(reader.readLine());
+        reader.readLine();
 
+        // EHLO command
         writer.print("EHLO ");
         writer.print(smptServerAddress);
         writer.print("\r\n");
         writer.flush();
 
         String line = reader.readLine();
-        System.out.println(line);
 
         while(line.startsWith("250-")) {
             line = reader.readLine();
-            System.out.println(line);
         }
 
         if(!line.startsWith("250 "))
@@ -61,6 +59,7 @@ public class SmtpClient implements ISmtpClient {
 
         reader.readLine();
 
+        // Send to the victims
         header.append("To: ");
         String prefix = "";
         for(String to : mail.getTo()) {
@@ -76,6 +75,7 @@ public class SmtpClient implements ISmtpClient {
             reader.readLine();
         }
 
+        // Send to the hidden witnesses
         header.append("\r\n");
         header.append("Cci: ");
         prefix = "";
@@ -104,11 +104,12 @@ public class SmtpClient implements ISmtpClient {
         // Set content type to utf-8
         writer.write("Content-type: text/plain; charset=\"utf-8\"\r\n");
 
+        // send content
         header.append(mail.getBody());
 
         writer.print(header.toString());
 
-        // End data "section"
+        // End data "section", actually send the mail
         writer.print("\r\n");
         writer.print(".");
         writer.print("\r\n");
