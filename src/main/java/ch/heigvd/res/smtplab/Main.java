@@ -26,5 +26,7 @@ public class Main {
         for(Prank prank : pranks) {
             smtpClient.sendMail(prank.generateMail());
         }
+
+        System.out.println("Success all emails have been sent!");
     }
 }
