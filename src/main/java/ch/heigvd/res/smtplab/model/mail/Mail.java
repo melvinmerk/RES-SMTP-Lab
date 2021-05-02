@@ -7,10 +7,9 @@ import java.util.Base64;
 public class Mail {
 
     private String from;
-    private String[] to = new String[0];
-    private String[] toBCC = new String[0];
+    private String[] to;
+    private String[] toBCC;
     private String body;
-    private String subject;
 
     public Mail(String from, String body, String[] to, String[] toBCC) {
         this.from = from;
@@ -25,11 +24,14 @@ public class Mail {
 
         String[] lines = body.split("\\r?\\n");
 
+        if(!lines[0].startsWith("Subject: "))
+            throw new RuntimeException("Malformed message, has to start with \"Subject: \"");
+
         String subject = lines[0].substring(9);
         subject = "=?utf-8?B?" +
                 Base64.getEncoder().encodeToString(subject.getBytes(StandardCharsets.UTF_8)) + "?=";
 
-        // Subject
+        // Subject base 64 encoded
         stringBuilder.append("Subject: ").append(subject).append("\r\n");
 
         for(int i = 1; i < lines.length; i++) {

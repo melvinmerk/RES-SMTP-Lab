@@ -100,6 +100,8 @@ public class SmtpClient implements ISmtpClient {
         writer.flush();
 
         reader.readLine();
+
+        // Set content type to utf-8
         writer.write("Content-type: text/plain; charset=\"utf-8\"\r\n");
 
         header.append(mail.getBody());

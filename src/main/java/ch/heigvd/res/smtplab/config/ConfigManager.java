@@ -8,13 +8,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class ConfigManager {
 
     private String smptServerAddress;
     private int smtpServerPort;
     private int numberOfGroups;
-    private List<String> witness;
+    private List<Person> witness;
+
+    public ConfigManager() throws IOException {
+        loadProperties();
+    }
 
     public List<String> loadMessageFromFile(String filename) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8));
@@ -60,7 +65,7 @@ public class ConfigManager {
         return persons;
     }
 
-    public void loadProperties() throws IOException {
+    private void loadProperties() throws IOException {
         FileInputStream fis = new FileInputStream("config/config.properties");
         Properties prop = new Properties();
         prop.load(fis);
@@ -74,7 +79,7 @@ public class ConfigManager {
 
         String[] witnesses = witnessToCC.split(",");
 
-        this.witness.addAll(Arrays.asList(witnesses));
+        this.witness = Arrays.stream(witnesses).map(Person::new).collect(Collectors.toList());
 
         fis.close();
     }
@@ -91,7 +96,7 @@ public class ConfigManager {
         return numberOfGroups;
     }
 
-    public List<String> getWitness() {
+    public List<Person> getWitness() {
         return witness;
     }
 }
