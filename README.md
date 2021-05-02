@@ -36,9 +36,19 @@ To use the program simply edit the 3 configuration files (in config folder):
       ```
 - victims.utf8: _list of email adresses to be pranked, one address per line_
 
+Once everything is configured, start the program like this:
+`java -jar smtp_prank.jar`
+
 ## How to install a mock server
 If you just want to tryout the program without actually pranking anyone, just follow this easy steps to install a mock server.  
 
+**You need to have docker installed!**
+- Download the docker folder of this repo
+- go in the docker folder
+- run the _build-image.sh_ script 
+- run the _run-container.sh_ script
+
+You mock server should now be started. You can go to _localhost:8282_ to see the fake emails sent with the program!
 
 ## Implementation details
 Most of the classes are inspired by the youtube playlist about this lab.  
